@@ -76,6 +76,28 @@
         "fees": "ark-fees/src/"
       }
     },
+    "fulmine": {
+      "repo": "ArkLabsHQ/fulmine",
+      "language": "go",
+      "description": "Lightning-Arkade swap daemon. VHTLC management, Boltz integration, delegate tasks, wallet operations.",
+      "entry_points": {
+        "domain": "internal/core/",
+        "vhtlc": "pkg/vhtlc/",
+        "swap": "pkg/swap/",
+        "boltz": "pkg/boltz/",
+        "api": "api-spec/",
+        "interface": "internal/interface/"
+      }
+    },
+    "noa": {
+      "repo": "louisinger/noa",
+      "language": "go",
+      "description": "Developer CLI for inspecting Arkade primitives. Decodes addresses, scripts, taptrees, PSBTs with Ark extensions.",
+      "entry_points": {
+        "commands": "command/",
+        "main": "main.go"
+      }
+    },
     "arkade-docs": {
       "repo": "arkade-os/ark-docs",
       "language": "mdx",

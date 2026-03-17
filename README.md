@@ -16,10 +16,11 @@ The server clones and caches Arkade repos locally, then exposes tools that let a
 | `search_repos` | Regex search across one or more repos (ripgrep with grep fallback) |
 | `read_file` | Read a file from any repo, with offset/limit for large files |
 | `check_docs_drift` | Detect API changes between cached and current source, flag affected docs pages |
+| `check_context_freshness` | Verify context docs against live source, flag stale file paths and symbols |
 
 ### Registry
 
-The server tracks 8 Arkade projects defined in `registry.json`:
+The server tracks 10 Arkade projects defined in `registry.json`:
 
 - **ts-sdk** - TypeScript SDK (`@arkade-os/sdk`)
 - **go-sdk** - Go client library
@@ -28,13 +29,17 @@ The server tracks 8 Arkade projects defined in `registry.json`:
 - **rust-sdk** - Rust SDK
 - **dotnet-sdk** - .NET SDK (NArk)
 - **arkade-assets** - UTXO-native asset protocol
+- **fulmine** - Lightning-Arkade swap daemon
+- **noa** - Developer CLI for inspecting Arkade primitives
 - **arkade-docs** - Official docs site (Mintlify)
 
 Each project entry maps named modules to source paths (entry points), so the LLM can request specific subsystems without navigating the repo itself.
 
 ### Context docs
 
-Hand-written architecture summaries live in `context/`. These cover high-level design, key types, and conventions that aren't obvious from code alone. Available for: ts-sdk, go-sdk, arkd, boltz-swap.
+Architecture and protocol knowledge summaries live in `context/`. These cover design, key types, and conventions that pure code parsing misses. Available for: ts-sdk, go-sdk, arkd, boltz-swap, rust-sdk, fulmine, noa-cli, vtxo-model, round-lifecycle, vhtlc, review-rules.
+
+Run `check_context_freshness` to verify these docs haven't drifted from the live source.
 
 ## Setup
 
