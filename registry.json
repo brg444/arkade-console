@@ -63,13 +63,17 @@
         "exports": "src/index.ts"
       }
     },
-    "arkade-escrow": {
-      "repo": "ArkLabsHQ/arkade-escrow",
-      "language": "typescript",
-      "description": "Escrow platform using 2-of-3 multisig VEC with Taproot spending paths.",
+    "rust-sdk": {
+      "repo": "arkade-os/rust-sdk",
+      "language": "rust",
+      "description": "Rust SDK for Arkade. Workspace with ark-core (types, addresses, VTXOs), ark-client (wallet, swaps, coin selection), ark-grpc/ark-rest transports.",
       "entry_points": {
-        "api": "apps/api/src/",
-        "web": "apps/web/src/"
+        "client": "ark-client/src/",
+        "core": "ark-core/src/",
+        "grpc": "ark-grpc/src/",
+        "rest": "ark-rest/src/",
+        "bdk-wallet": "ark-bdk-wallet/src/",
+        "fees": "ark-fees/src/"
       }
     },
     "arkade-docs": {

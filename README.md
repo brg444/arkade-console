@@ -25,9 +25,9 @@ The server tracks 8 Arkade projects defined in `registry.json`:
 - **go-sdk** - Go client library
 - **arkd** - Protocol server
 - **boltz-swap** - Boltz swap integration
+- **rust-sdk** - Rust SDK
 - **dotnet-sdk** - .NET SDK (NArk)
 - **arkade-assets** - UTXO-native asset protocol
-- **arkade-escrow** - Escrow platform (2-of-3 multisig)
 - **arkade-docs** - Official docs site (Mintlify)
 
 Each project entry maps named modules to source paths (entry points), so the LLM can request specific subsystems without navigating the repo itself.
