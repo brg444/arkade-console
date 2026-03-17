@@ -9,7 +9,7 @@
         "identity": "src/identity/",
         "wallet": "src/wallet/",
         "providers": "src/providers/",
-        "crypto": "src/crypto/",
+        "musig2": "src/musig2/",
         "storage": "src/storage/",
         "types": "src/types/"
       }
