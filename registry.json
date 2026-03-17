@@ -1,0 +1,84 @@
+{
+  "projects": {
+    "ts-sdk": {
+      "repo": "arkade-os/ts-sdk",
+      "language": "typescript",
+      "description": "TypeScript SDK (@arkade-os/sdk). Wallet, identity, VTXO ops, MuSig2, assets, delegation.",
+      "entry_points": {
+        "exports": "src/index.ts",
+        "identity": "src/identity/",
+        "wallet": "src/wallet/",
+        "providers": "src/providers/",
+        "crypto": "src/crypto/",
+        "storage": "src/storage/",
+        "types": "src/types/"
+      }
+    },
+    "go-sdk": {
+      "repo": "arkade-os/go-sdk",
+      "language": "go",
+      "description": "Go client library for Arkade wallets. Key management, send/receive, VTXO lifecycle, gRPC transport.",
+      "entry_points": {
+        "client": "client.go",
+        "types": "types.go",
+        "store": "store/",
+        "wallet": "wallet/"
+      }
+    },
+    "arkd": {
+      "repo": "arkade-os/ark",
+      "language": "go",
+      "description": "Arkade protocol server. Manages VTXOs, off-chain rounds, liquidity. Hexagonal architecture, gRPC/REST.",
+      "entry_points": {
+        "api": "api-spec/protobuf/",
+        "domain": "server/internal/core/domain/",
+        "application": "server/internal/core/application/",
+        "handlers": "server/internal/interface/grpc/"
+      }
+    },
+    "boltz-swap": {
+      "repo": "arkade-os/boltz-swap",
+      "language": "typescript",
+      "description": "TypeScript library for Boltz swaps in Arkade wallets. SwapManager, VHTLC support.",
+      "entry_points": {
+        "exports": "src/index.ts",
+        "types": "src/types.ts",
+        "swap_manager": "src/swap-manager/"
+      }
+    },
+    "dotnet-sdk": {
+      "repo": "arkade-os/dotnet-sdk",
+      "language": "csharp",
+      "description": ".NET SDK (NArk). VTXO management, MuSig2 batch signing, intent transactions.",
+      "entry_points": {
+        "client": "src/NArk/",
+        "tests": "test/"
+      }
+    },
+    "arkade-assets": {
+      "repo": "ArkLabsHQ/arkade-assets",
+      "language": "typescript",
+      "description": "UTXO-native asset protocol for fungible/non-fungible tokens on Arkade.",
+      "entry_points": {
+        "exports": "src/index.ts"
+      }
+    },
+    "arkade-escrow": {
+      "repo": "ArkLabsHQ/arkade-escrow",
+      "language": "typescript",
+      "description": "Escrow platform using 2-of-3 multisig VEC with Taproot spending paths.",
+      "entry_points": {
+        "api": "apps/api/src/",
+        "web": "apps/web/src/"
+      }
+    },
+    "arkade-docs": {
+      "repo": "arkade-os/ark-docs",
+      "language": "mdx",
+      "description": "Official Arkade docs site (Mintlify). Protocol concepts, arkd, wallet guides, contracts.",
+      "entry_points": {
+        "root": "."
+      }
+    }
+  }
+}
