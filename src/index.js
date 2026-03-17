@@ -728,6 +728,119 @@ server.tool(
   }
 );
 
+// Tool: check_context_freshness
+server.tool(
+  "check_context_freshness",
+  "Verify context docs against live source. Checks that types, functions, and file paths referenced in context/ docs still exist in the actual repos. Flags stale references.",
+  {
+    context_doc: z
+      .string()
+      .optional()
+      .describe(
+        "Specific context doc to check (e.g. 'ts-sdk', 'vtxo-model'). Omit to check all."
+      ),
+  },
+  async ({ context_doc }) => {
+    const contextDir = join(ROOT, "context");
+    if (!existsSync(contextDir)) {
+      return { content: [{ type: "text", text: "No context/ directory found." }] };
+    }
+
+    const docs = context_doc
+      ? [`${context_doc}.md`]
+      : readdirSync(contextDir).filter((f) => f.endsWith(".md"));
+
+    const report = [];
+
+    for (const docFile of docs) {
+      const docPath = join(contextDir, docFile);
+      if (!existsSync(docPath)) {
+        report.push(`## ${docFile}\nFile not found.`);
+        continue;
+      }
+
+      const content = readFileSync(docPath, "utf-8");
+      const docName = docFile.replace(".md", "");
+
+      // Extract referenced file paths (patterns like `src/foo/bar.go`, `internal/core/domain/vtxo.go`)
+      const pathRefs = [
+        ...content.matchAll(/`([a-zA-Z][a-zA-Z0-9_\-./]*\.(go|ts|tsx|rs|toml|proto))`/g),
+      ].map((m) => m[1]);
+
+      // Extract referenced type/function names (patterns like `type Foo`, `func Bar`, `export interface Baz`)
+      const symbolRefs = [
+        ...content.matchAll(
+          /(?:type|func|struct|interface|class|trait|enum|const)\s+(\w{4,})/g
+        ),
+      ].map((m) => m[1]);
+
+      // Determine which repos to check based on doc name and content
+      const repoHints = [];
+      for (const [id, proj] of Object.entries(REGISTRY.projects)) {
+        if (docName === id || content.includes(proj.repo) || content.includes(id)) {
+          repoHints.push(id);
+        }
+      }
+
+      const issues = [];
+      const checked = { paths: 0, symbols: 0 };
+
+      for (const projectId of repoHints) {
+        if (!repoExists(projectId)) continue;
+        const repoDir = join(CACHE_DIR, projectId);
+
+        // Check file paths
+        const uniquePaths = [...new Set(pathRefs)];
+        for (const refPath of uniquePaths) {
+          const fullPath = join(repoDir, refPath);
+          if (!existsSync(fullPath)) {
+            // Try common prefixes
+            const prefixed = [refPath, `server/${refPath}`, `src/${refPath}`];
+            const found = prefixed.some((p) => existsSync(join(repoDir, p)));
+            if (!found) {
+              issues.push(`Path not found: \`${refPath}\` (checked in ${projectId})`);
+            }
+          }
+          checked.paths++;
+        }
+
+        // Spot-check symbols (grep a sample)
+        const symbolSample = [...new Set(symbolRefs)].slice(0, 15);
+        for (const symbol of symbolSample) {
+          const result = searchInRepo(repoDir, symbol, null);
+          if (result === "No matches found") {
+            issues.push(`Symbol not found: \`${symbol}\` (checked in ${projectId})`);
+          }
+          checked.symbols++;
+        }
+      }
+
+      if (repoHints.length === 0) {
+        report.push(
+          `## ${docFile}\nNo matching repos cached. Run get_project_info first for related projects.`
+        );
+      } else if (issues.length === 0) {
+        report.push(
+          `## ${docFile}\nAll references valid. Checked ${checked.paths} paths, ${checked.symbols} symbols in [${repoHints.join(", ")}].`
+        );
+      } else {
+        report.push(
+          `## ${docFile}\n${issues.length} stale reference(s) found (checked ${checked.paths} paths, ${checked.symbols} symbols in [${repoHints.join(", ")}]):\n${issues.map((i) => `- ${i}`).join("\n")}`
+        );
+      }
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `# Context Freshness Report\n\n${report.join("\n\n")}`,
+        },
+      ],
+    };
+  }
+);
+
 // --- Start ---
 
 const transport = new StdioServerTransport();
