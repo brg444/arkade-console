@@ -60,7 +60,10 @@
       "language": "typescript",
       "description": "UTXO-native asset protocol for fungible/non-fungible tokens on Arkade.",
       "entry_points": {
-        "exports": "src/index.ts"
+        "spec:main": "arkade-assets.md",
+        "spec:opcodes": "arkade-script.md",
+        "examples": "examples.md",
+        "tools": "tools/"
       }
     },
     "rust-sdk": {
