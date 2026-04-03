@@ -3,7 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { readFileSync, existsSync, readdirSync, statSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { execSync } from "child_process";
@@ -21,6 +21,26 @@ watch(join(ROOT, "registry.json"), () => {
   try { REGISTRY = loadRegistry(); } catch {}
 });
 const CACHE_DIR = join(ROOT, ".repo-cache");
+const SNAPSHOT_DIR = join(ROOT, ".snapshots");
+
+// --- Snapshot persistence ---
+
+function saveSnapshot(project, snapshot, tag) {
+  const dir = join(SNAPSHOT_DIR, project);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  const data = { tag, timestamp: new Date().toISOString(), surface: snapshot };
+  writeFileSync(join(dir, "latest.json"), JSON.stringify(data, null, 2));
+}
+
+function loadSnapshot(project) {
+  const path = join(SNAPSHOT_DIR, project, "latest.json");
+  if (!existsSync(path)) return null;
+  try {
+    return JSON.parse(readFileSync(path, "utf-8"));
+  } catch {
+    return null;
+  }
+}
 
 // --- Repo management ---
 
@@ -938,38 +958,50 @@ server.tool(
       };
     }
 
-    const repoDir = join(CACHE_DIR, project);
-    if (!repoExists(project)) {
+    // Pull latest
+    let repoDir;
+    try {
+      repoDir = ensureRepo(project);
+    } catch (e) {
+      return { content: [{ type: "text", text: `Failed to access ${project}: ${e.message}` }] };
+    }
+
+    const newTag = getLatestTag(repoDir);
+
+    // Snapshot current state
+    const after = snapshotApiSurface(repoDir, project);
+
+    // Load previous snapshot from disk (persisted from last run)
+    const saved = loadSnapshot(project);
+    let before, oldTag, baselineNote;
+
+    if (saved) {
+      before = saved.surface;
+      oldTag = saved.tag;
+      baselineNote = `Baseline: ${saved.tag} (saved ${saved.timestamp})`;
+    } else {
+      // No saved snapshot: first run. Save current as baseline and report.
+      saveSnapshot(project, after, newTag);
       return {
-        content: [
-          {
-            type: "text",
-            text: "No cached version to compare against. Run get_api_surface first, then check again after the repo updates.",
-          },
-        ],
+        content: [{
+          type: "text",
+          text: `# API Drift Report: ${project}\n\nFirst run. Saved current API surface as baseline (${newTag}).\nRun again after code changes to detect drift.`,
+        }],
       };
     }
 
-    // Snapshot before pull
-    const before = snapshotApiSurface(repoDir, project);
-    const oldTag = getLatestTag(repoDir);
-
-    // Pull latest
-    ensureRepo(project);
-    const newTag = getLatestTag(repoDir);
-
-    // Snapshot after pull
-    const after = snapshotApiSurface(repoDir, project);
-
-    // Diff
+    // Diff against saved baseline
     const changes = diffSnapshots(before, after);
+
+    // Always save current as new baseline
+    saveSnapshot(project, after, newTag);
 
     if (changes.length === 0) {
       return {
         content: [
           {
             type: "text",
-            text: `No API surface changes detected in ${project} (${oldTag} -> ${newTag}).`,
+            text: `# API Drift Report: ${project}\n\nNo API surface changes detected.\n${baselineNote}\nCurrent: ${newTag}`,
           },
         ],
       };
@@ -992,7 +1024,8 @@ server.tool(
     // Format report
     const parts = [
       `# API Drift Report: ${project}`,
-      `Version: ${oldTag} -> ${newTag}`,
+      baselineNote,
+      `Current: ${newTag}`,
       `Changes detected in ${changes.length} module(s)`,
       "",
     ];
