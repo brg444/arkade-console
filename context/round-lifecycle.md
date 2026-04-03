@@ -61,7 +61,7 @@ type Round struct {
 }
 ```
 
-Source: `arkd/internal/core/domain/round.go`
+Source: `internal/core/domain/round.go`
 
 ## Intent Structure
 
@@ -132,11 +132,11 @@ func (r *Round) ExpiryTimestamp() int64 {
 
 | File | Contents |
 |------|----------|
-| `arkd/internal/core/domain/round.go` | Round entity, stages, state machine |
-| `arkd/internal/core/domain/round_event.go` | Event types |
-| `arkd/internal/core/domain/intent.go` | Intent entity, validation |
-| `arkd/internal/core/application/service.go` | startRound, startFinalization, finalizeRound |
-| `arkd/internal/core/ports/cache.go` | CurrentRound, ForfeitTxs cache interfaces |
+| `internal/core/domain/round.go` | Round entity, stages, state machine |
+| `internal/core/domain/round_event.go` | Event types |
+| `internal/core/domain/intent.go` | Intent entity, validation |
+| `internal/core/application/service.go` | startRound, startFinalization, finalizeRound |
+| `internal/core/ports/live_store.go` | CurrentRound, ForfeitTxs live store interfaces |
 
 ## Edge Cases
 

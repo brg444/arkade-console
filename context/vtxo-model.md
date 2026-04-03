@@ -70,7 +70,7 @@ type Vtxo struct {
 }
 ```
 
-Source: `arkd/internal/core/domain/vtxo.go`
+Source: `internal/core/domain/vtxo.go`
 
 ## Client-Side Model (Go SDK)
 
@@ -87,7 +87,7 @@ type Vtxo struct {
 }
 ```
 
-Source: `go-sdk/types/types.go`
+Source: `types/types.go`
 
 ## Spending Rules
 

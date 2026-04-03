@@ -26,14 +26,14 @@
       }
     },
     "arkd": {
-      "repo": "arkade-os/ark",
+      "repo": "arkade-os/arkd",
       "language": "go",
       "description": "Arkade protocol server. Manages VTXOs, off-chain rounds, liquidity. Hexagonal architecture, gRPC/REST.",
       "entry_points": {
         "api": "api-spec/protobuf/",
-        "domain": "server/internal/core/domain/",
-        "application": "server/internal/core/application/",
-        "handlers": "server/internal/interface/grpc/"
+        "domain": "internal/core/domain/",
+        "application": "internal/core/application/",
+        "handlers": "internal/interface/grpc/"
       }
     },
     "boltz-swap": {
@@ -43,7 +43,7 @@
       "entry_points": {
         "exports": "src/index.ts",
         "types": "src/types.ts",
-        "swap_manager": "src/swap-manager/"
+        "swap_manager": "src/swap-manager.ts"
       }
     },
     "dotnet-sdk": {
@@ -51,8 +51,11 @@
       "language": "csharp",
       "description": ".NET SDK (NArk). VTXO management, MuSig2 batch signing, intent transactions.",
       "entry_points": {
-        "client": "src/NArk/",
-        "tests": "test/"
+        "core": "NArk.Core/",
+        "abstractions": "NArk.Abstractions/",
+        "swaps": "NArk.Swaps/",
+        "storage": "NArk.Storage.EfCore/",
+        "tests": "NArk.Tests/"
       }
     },
     "arkade-assets": {
@@ -60,7 +63,9 @@
       "language": "typescript",
       "description": "UTXO-native asset protocol for fungible/non-fungible tokens on Arkade.",
       "entry_points": {
-        "exports": "src/index.ts"
+        "codec": "tools/arkade-assets-codec.ts",
+        "cli": "tools/cli.ts",
+        "indexer": "tools/indexer.ts"
       }
     },
     "rust-sdk": {
@@ -99,7 +104,7 @@
       }
     },
     "arkade-docs": {
-      "repo": "arkade-os/ark-docs",
+      "repo": "arkade-os/docs",
       "language": "mdx",
       "description": "Official Arkade docs site (Mintlify). Protocol concepts, arkd, wallet guides, contracts.",
       "entry_points": {
